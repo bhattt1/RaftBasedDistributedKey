@@ -186,3 +186,28 @@ func TestDefaultsKeepOperationalEndpointsPrivate(t *testing.T) {
 		t.Errorf("unsafe options are on by default: %+v", d)
 	}
 }
+
+// The example files in configs/ are documentation. Loading them here keeps
+// them from drifting away from what the server actually accepts.
+func TestExampleConfigurationFilesLoad(t *testing.T) {
+	for _, tc := range []struct {
+		file   string
+		secure bool
+	}{
+		{"node.example.json", false},
+		{"node.secure.example.json", true},
+	} {
+		t.Run(tc.file, func(t *testing.T) {
+			cfg, err := load(t, []string{"--config", filepath.Join("..", "..", "configs", tc.file)}, nil)
+			if err != nil {
+				t.Fatalf("the example does not load: %v", err)
+			}
+			if cfg.NodeID != "n1" || len(cfg.Peers) != 3 || cfg.InsecureDev == tc.secure {
+				t.Fatalf("unexpected contents: %+v", cfg)
+			}
+			if tc.secure && cfg.TLS.ClientTokenFile == "" {
+				t.Fatal("the secure example has no token file")
+			}
+		})
+	}
+}
