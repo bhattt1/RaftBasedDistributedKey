@@ -1,0 +1,99 @@
+// Peer-to-peer protocol between raft-kv nodes.
+//
+// PreVote, RequestVote and AppendEntries are unary RPCs. AppendEntries may
+// carry a batch of entries in one request; that is batching, not streaming.
+// InstallSnapshot is the only streaming RPC: the leader streams the snapshot
+// file to the follower in bounded chunks (client-side streaming) and the
+// follower answers once at the end.
+syntax = "proto3";
+
+package raftkv.raft.v1;
+
+option go_package = "github.com/bhattt1/RaftBasedDistributedKey/internal/gen/raft/v1;raftv1";
+
+service Raft {
+  // PreVote asks whether the receiver would vote for the sender if it started
+  // an election. Nobody's term or vote changes as a result.
+  rpc PreVote(VoteRequest) returns (VoteResponse);
+  // RequestVote asks for a vote in the sender's current term.
+  rpc RequestVote(VoteRequest) returns (VoteResponse);
+  // AppendEntries replicates log entries and doubles as the heartbeat.
+  rpc AppendEntries(AppendEntriesRequest) returns (AppendEntriesResponse);
+  // InstallSnapshot replaces a lagging follower's state with a snapshot.
+  rpc InstallSnapshot(stream SnapshotChunk) returns (InstallSnapshotResponse);
+}
+
+// Header is on every message. Receivers reject a message whose cluster does
+// not match theirs, whose recipient is not them, or whose sender is not in
+// their configured voter set.
+message Header {
+  string cluster_id = 1;
+  string from = 2;
+  string to = 3;
+  // The sender's current term, except in PreVote: a PreVote request, and a
+  // granted PreVote response, carry the term the candidate would campaign in.
+  uint64 term = 4;
+}
+
+enum EntryType {
+  ENTRY_TYPE_UNSPECIFIED = 0;
+  // Appended by a new leader; carries no data.
+  ENTRY_TYPE_NOOP = 1;
+  // Carries an encoded key-value command.
+  ENTRY_TYPE_COMMAND = 2;
+}
+
+message Entry {
+  uint64 index = 1;
+  uint64 term = 2;
+  EntryType type = 3;
+  bytes data = 4;
+}
+
+message VoteRequest {
+  Header header = 1;
+  uint64 last_log_index = 2;
+  uint64 last_log_term = 3;
+}
+
+message VoteResponse {
+  Header header = 1;
+  bool granted = 2;
+}
+
+message AppendEntriesRequest {
+  Header header = 1;
+  uint64 prev_log_index = 2;
+  uint64 prev_log_term = 3;
+  repeated Entry entries = 4;
+  uint64 leader_commit = 5;
+}
+
+message AppendEntriesResponse {
+  Header header = 1;
+  bool success = 2;
+  // On success: the highest index known to match the leader's log.
+  uint64 match_index = 3;
+  // On rejection: where the leader should retry from. conflict_term is zero
+  // when the follower's log is simply shorter than prev_log_index.
+  uint64 conflict_index = 4;
+  uint64 conflict_term = 5;
+}
+
+message SnapshotChunk {
+  // Set on the first chunk only.
+  Header header = 1;
+  // Total size in bytes of the snapshot file; set on the first chunk only.
+  uint64 total_size = 2;
+  // The next bytes of the snapshot file. The file carries its own header
+  // (last included index and term, cluster ID) and checksums, which the
+  // receiver verifies before using it.
+  bytes data = 3;
+}
+
+message InstallSnapshotResponse {
+  Header header = 1;
+  bool success = 2;
+  // The follower's position after handling the snapshot.
+  uint64 match_index = 3;
+}
