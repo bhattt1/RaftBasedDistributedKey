@@ -128,7 +128,7 @@ down: ## Stop the Docker cluster, keeping its data
 	scripts/cluster.sh down
 
 .PHONY: demo
-demo: build ## Run every demo: normal operations, crash, partition, quorum loss, snapshot
+demo: build ## Run every demo with commentary: normal operations, then six failure scenarios
 	scripts/demo.sh
 
 .PHONY: chaos
@@ -140,6 +140,7 @@ chaos: build ## Run the fault demos against the Docker cluster; non-zero exit if
 	scripts/demo-quorum-loss.sh
 	scripts/demo-snapshot.sh
 	scripts/demo-five-node.sh
+	docker compose -f docker-compose.5node.yml stop
 
 # ---- benchmarks --------------------------------------------------------------
 

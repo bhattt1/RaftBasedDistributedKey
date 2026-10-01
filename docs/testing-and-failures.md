@@ -36,7 +36,7 @@ description of the cluster if it is not met.
 | `make crash` | storage crash injection, 60 seeds | 10 s |
 | `make linearizability` | model self-tests, 300 simulated seeds, one live run | 15 s |
 | `make integration` | real processes | 35 s |
-| `make chaos` | the six Docker demos | a few minutes |
+| `make chaos` | the six Docker demos | 1 to 2 min once the image is built |
 | `make fuzz` | each of the five fuzz targets for 20 s | 2 min |
 | `make check` | lint plus everything above except `chaos` and `fuzz` | 2 to 3 min |
 
