@@ -1,0 +1,81 @@
+# Five-node cluster. Standalone file with its own project name, volumes and
+# host ports (8101-8105, 9101-9105), so it can run next to the three-node one.
+#
+#   docker compose -f docker-compose.5node.yml up -d --build
+#   bin/kvctl --endpoints http://127.0.0.1:8101,http://127.0.0.1:8102,http://127.0.0.1:8103,http://127.0.0.1:8104,http://127.0.0.1:8105 status
+#
+# Five nodes tolerate two failures; a write needs three durable copies.
+# INSECURE DEVELOPMENT MODE, loopback ports only.
+name: raftkv5
+
+x-node: &node
+  image: raftkv:local
+  pull_policy: never
+  restart: "no"
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+  networks: [cluster]
+  stop_grace_period: 15s
+  healthcheck:
+    test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8000/healthz"]
+    interval: 2s
+    timeout: 2s
+    retries: 15
+  environment: &env
+    RAFTKV_INSECURE_DEV: "true"
+    RAFTKV_CLUSTER_ID: compose-dev-5
+    RAFTKV_DATA_DIR: /var/lib/raftkv
+    RAFTKV_RAFT_LISTEN: ":7000"
+    RAFTKV_HTTP_LISTEN: ":8000"
+    RAFTKV_ADMIN_LISTEN: ":9000"
+    RAFTKV_PEERS: "n1=n1:7000@http://127.0.0.1:8101,n2=n2:7000@http://127.0.0.1:8102,n3=n3:7000@http://127.0.0.1:8103,n4=n4:7000@http://127.0.0.1:8104,n5=n5:7000@http://127.0.0.1:8105"
+    RAFTKV_SNAPSHOT_THRESHOLD: "${RAFTKV_SNAPSHOT_THRESHOLD:-1000}"
+    RAFTKV_SNAPSHOT_TRAILING: "${RAFTKV_SNAPSHOT_TRAILING:-100}"
+    RAFTKV_UNSAFE_NO_FSYNC: "${RAFTKV_UNSAFE_NO_FSYNC:-false}"
+
+services:
+  # Only n1 declares the build; see docker-compose.yml for why.
+  n1:
+    <<: *node
+    build:
+      context: .
+      target: runtime
+    hostname: n1
+    environment: {<<: *env, RAFTKV_NODE_ID: n1}
+    ports: ["127.0.0.1:8101:8000", "127.0.0.1:9101:9000"]
+    volumes: ["n1-data:/var/lib/raftkv"]
+  n2:
+    <<: *node
+    hostname: n2
+    environment: {<<: *env, RAFTKV_NODE_ID: n2}
+    ports: ["127.0.0.1:8102:8000", "127.0.0.1:9102:9000"]
+    volumes: ["n2-data:/var/lib/raftkv"]
+  n3:
+    <<: *node
+    hostname: n3
+    environment: {<<: *env, RAFTKV_NODE_ID: n3}
+    ports: ["127.0.0.1:8103:8000", "127.0.0.1:9103:9000"]
+    volumes: ["n3-data:/var/lib/raftkv"]
+  n4:
+    <<: *node
+    hostname: n4
+    environment: {<<: *env, RAFTKV_NODE_ID: n4}
+    ports: ["127.0.0.1:8104:8000", "127.0.0.1:9104:9000"]
+    volumes: ["n4-data:/var/lib/raftkv"]
+  n5:
+    <<: *node
+    hostname: n5
+    environment: {<<: *env, RAFTKV_NODE_ID: n5}
+    ports: ["127.0.0.1:8105:8000", "127.0.0.1:9105:9000"]
+    volumes: ["n5-data:/var/lib/raftkv"]
+
+networks:
+  cluster:
+
+volumes:
+  n1-data:
+  n2-data:
+  n3-data:
+  n4-data:
+  n5-data:

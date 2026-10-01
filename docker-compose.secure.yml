@@ -1,0 +1,98 @@
+# Three-node cluster in secure mode: mutual TLS between peers, HTTPS for
+# clients, and a bearer token. Standalone file, own project and host ports
+# (8201-8203 for clients, 9201-9203 for metrics).
+#
+#   scripts/gen-dev-certs.sh              (creates ./certs, which is git-ignored)
+#   scripts/cluster.sh secure-up
+#   bin/kvctl --endpoints https://127.0.0.1:8201,https://127.0.0.1:8202,https://127.0.0.1:8203 \
+#             --ca-cert certs/ca.pem --token-file certs/client.token put greeting hello
+#
+# The certificates are development certificates made by a local script. For a
+# real deployment, issue them from your own CA and deliver them, and the
+# token, through your secret store.
+name: raftkv-secure
+
+x-node: &node
+  image: raftkv:local
+  pull_policy: never
+  restart: "no"
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+  networks: [cluster]
+  stop_grace_period: 15s
+  # The private keys in ./certs are readable only by the user who generated
+  # them, so the node runs as that user instead of the image's default one.
+  # scripts/cluster.sh sets these two variables from `id`.
+  user: "${RAFTKV_UID:?run this through scripts/cluster.sh secure-up}:${RAFTKV_GID:?run this through scripts/cluster.sh secure-up}"
+  depends_on:
+    prepare-volumes:
+      condition: service_completed_successfully
+  environment: &env
+    RAFTKV_CLUSTER_ID: compose-secure
+    RAFTKV_DATA_DIR: /var/lib/raftkv
+    RAFTKV_RAFT_LISTEN: ":7000"
+    RAFTKV_HTTP_LISTEN: ":8000"
+    RAFTKV_ADMIN_LISTEN: ":9000"
+    RAFTKV_PEERS: "n1=n1:7000@https://127.0.0.1:8201,n2=n2:7000@https://127.0.0.1:8202,n3=n3:7000@https://127.0.0.1:8203"
+    RAFTKV_TLS_PEER_CA: /certs/ca.pem
+    RAFTKV_CLIENT_TOKEN_FILE: /certs/client.token
+
+services:
+  # Named volumes are created owned by the image's user. This one-shot
+  # container hands them to the user the nodes run as. It is the only thing
+  # here that runs as root, and it has no network.
+  prepare-volumes:
+    image: raftkv:local
+    build:
+      context: .
+      target: runtime
+    user: "0:0"
+    network_mode: none
+    entrypoint: ["/bin/sh", "-c", "chown ${RAFTKV_UID}:${RAFTKV_GID} /data/n1 /data/n2 /data/n3 && chmod 0700 /data/n1 /data/n2 /data/n3"]
+    volumes: ["n1-data:/data/n1", "n2-data:/data/n2", "n3-data:/data/n3"]
+
+  n1:
+    <<: *node
+    hostname: n1
+    environment:
+      <<: *env
+      RAFTKV_NODE_ID: n1
+      RAFTKV_TLS_PEER_CERT: /certs/n1.pem
+      RAFTKV_TLS_PEER_KEY: /certs/n1.key
+      RAFTKV_TLS_HTTP_CERT: /certs/n1.pem
+      RAFTKV_TLS_HTTP_KEY: /certs/n1.key
+    ports: ["127.0.0.1:8201:8000", "127.0.0.1:9201:9000"]
+    volumes: ["n1-data:/var/lib/raftkv", "./certs:/certs:ro"]
+  n2:
+    <<: *node
+    hostname: n2
+    environment:
+      <<: *env
+      RAFTKV_NODE_ID: n2
+      RAFTKV_TLS_PEER_CERT: /certs/n2.pem
+      RAFTKV_TLS_PEER_KEY: /certs/n2.key
+      RAFTKV_TLS_HTTP_CERT: /certs/n2.pem
+      RAFTKV_TLS_HTTP_KEY: /certs/n2.key
+    ports: ["127.0.0.1:8202:8000", "127.0.0.1:9202:9000"]
+    volumes: ["n2-data:/var/lib/raftkv", "./certs:/certs:ro"]
+  n3:
+    <<: *node
+    hostname: n3
+    environment:
+      <<: *env
+      RAFTKV_NODE_ID: n3
+      RAFTKV_TLS_PEER_CERT: /certs/n3.pem
+      RAFTKV_TLS_PEER_KEY: /certs/n3.key
+      RAFTKV_TLS_HTTP_CERT: /certs/n3.pem
+      RAFTKV_TLS_HTTP_KEY: /certs/n3.key
+    ports: ["127.0.0.1:8203:8000", "127.0.0.1:9203:9000"]
+    volumes: ["n3-data:/var/lib/raftkv", "./certs:/certs:ro"]
+
+networks:
+  cluster:
+
+volumes:
+  n1-data:
+  n2-data:
+  n3-data:
