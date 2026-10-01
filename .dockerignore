@@ -1,0 +1,12 @@
+.git
+.github
+bin
+data
+tmp
+certs
+benchmarks/results
+docs
+*.md
+*.key
+*.pem
+*.token
