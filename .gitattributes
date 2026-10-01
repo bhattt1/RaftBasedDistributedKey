@@ -1,0 +1,4 @@
+# Shell scripts and Go sources must keep LF endings even when checked out on Windows,
+# otherwise the scripts break inside Linux containers.
+* text=auto eol=lf
+*.png binary

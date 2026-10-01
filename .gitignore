@@ -1,0 +1,25 @@
+# build outputs
+/bin/
+*.test
+*.out
+*.prof
+
+# node data directories and local run state
+/data/
+/tmp/
+*.wal
+*.snap
+
+# credentials: generated locally by scripts/gen-dev-certs.sh, never committed
+/certs/
+*.key
+*.pem
+*.crt
+*.csr
+*.srl
+*.token
+
+# editor / OS noise
+.idea/
+.vscode/
+.DS_Store
