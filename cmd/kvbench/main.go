@@ -46,6 +46,7 @@ type options struct {
 	readFraction float64
 	attempts     int
 	attemptTO    time.Duration
+	preload      bool
 	output       string
 	label        string
 	seed         int64
@@ -144,6 +145,7 @@ func run(args []string, stdout, stderr io.Writer) int {
 	fs.IntVar(&o.valueBytes, "value-bytes", 128, "value size in bytes")
 	fs.Float64Var(&o.readFraction, "read-fraction", 0.9, "mixed: fraction of requests that are reads")
 	fs.IntVar(&o.attempts, "attempts", 4, "maximum attempts per request, including the first")
+	fs.BoolVar(&o.preload, "preload", true, "write every key before measuring (read, mixed and cas need the keys to exist)")
 	fs.DurationVar(&o.attemptTO, "attempt-timeout", 3*time.Second, "deadline of one attempt")
 	fs.StringVar(&o.output, "output", "", "write the JSON report to this file")
 	fs.StringVar(&o.label, "label", "", "name for this benchmark in the report")
@@ -239,7 +241,7 @@ func keyName(i int) string { return "bench/k" + strconv.Itoa(i) }
 
 // preload makes sure every key a read or CAS will touch exists.
 func preload(c *client.Client, o options) error {
-	if o.workload == "write" {
+	if o.workload == "write" || !o.preload {
 		return nil
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
