@@ -1,0 +1,52 @@
+goos: linux
+goarch: amd64
+pkg: github.com/bhattt1/RaftBasedDistributedKey/internal/storage
+cpu: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
+BenchmarkWALAppendSynced/batch=1-8         	     808	   1460044 ns/op	       684.9 entries/s	     200 B/op	       4 allocs/op
+BenchmarkWALAppendSynced/batch=1-8         	     900	   1504916 ns/op	       664.5 entries/s	     200 B/op	       4 allocs/op
+BenchmarkWALAppendSynced/batch=1-8         	     884	   1519212 ns/op	       658.2 entries/s	     200 B/op	       4 allocs/op
+BenchmarkWALAppendSynced/batch=8-8         	     650	   2146787 ns/op	      3726 entries/s	    1438 B/op	      18 allocs/op
+BenchmarkWALAppendSynced/batch=8-8         	     796	   1665171 ns/op	      4804 entries/s	    1437 B/op	      18 allocs/op
+BenchmarkWALAppendSynced/batch=8-8         	     966	   1362695 ns/op	      5871 entries/s	    1436 B/op	      18 allocs/op
+BenchmarkWALAppendSynced/batch=64-8        	     758	   1981652 ns/op	     32296 entries/s	   11347 B/op	     130 allocs/op
+BenchmarkWALAppendSynced/batch=64-8        	     646	   1894655 ns/op	     33779 entries/s	   11357 B/op	     130 allocs/op
+BenchmarkWALAppendSynced/batch=64-8        	     758	   1742498 ns/op	     36729 entries/s	   11347 B/op	     130 allocs/op
+BenchmarkWALAppendSynced/batch=256-8       	     692	   1737695 ns/op	    147322 entries/s	   45304 B/op	     514 allocs/op
+BenchmarkWALAppendSynced/batch=256-8       	     656	   3115512 ns/op	     82169 entries/s	   45316 B/op	     514 allocs/op
+BenchmarkWALAppendSynced/batch=256-8       	     638	   1926654 ns/op	    132873 entries/s	   45323 B/op	     514 allocs/op
+BenchmarkWALAppendNoSync/batch=1-8         	 1140985	       939.5 ns/op	 136.24 MB/s	    1432 B/op	       4 allocs/op
+BenchmarkWALAppendNoSync/batch=1-8         	 1390898	       890.0 ns/op	 143.81 MB/s	    1459 B/op	       4 allocs/op
+BenchmarkWALAppendNoSync/batch=1-8         	 1937271	       853.6 ns/op	 149.95 MB/s	    1349 B/op	       4 allocs/op
+BenchmarkWALAppendNoSync/batch=64-8        	   79144	    215596 ns/op	  38.00 MB/s	   79403 B/op	     130 allocs/op
+BenchmarkWALAppendNoSync/batch=64-8        	   67131	     35561 ns/op	 230.36 MB/s	   76105 B/op	     130 allocs/op
+BenchmarkWALAppendNoSync/batch=64-8        	   64280	     24526 ns/op	 334.01 MB/s	   78530 B/op	     130 allocs/op
+BenchmarkRecovery-8                        	     183	   8896924 ns/op	21122282 B/op	   20103 allocs/op
+BenchmarkRecovery-8                        	      99	  10994001 ns/op	21116982 B/op	   20103 allocs/op
+BenchmarkRecovery-8                        	     129	   9334584 ns/op	21116959 B/op	   20103 allocs/op
+PASS
+ok  	github.com/bhattt1/RaftBasedDistributedKey/internal/storage	55.994s
+goos: linux
+goarch: amd64
+pkg: github.com/bhattt1/RaftBasedDistributedKey/internal/kv
+cpu: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz
+BenchmarkEncode-8      	13376570	        92.49 ns/op	     176 B/op	       1 allocs/op
+BenchmarkEncode-8      	16157155	       109.3 ns/op	     176 B/op	       1 allocs/op
+BenchmarkEncode-8      	12368514	        83.78 ns/op	     176 B/op	       1 allocs/op
+BenchmarkDecode-8      	 6792978	       168.8 ns/op	     192 B/op	       5 allocs/op
+BenchmarkDecode-8      	 7449133	       195.7 ns/op	     192 B/op	       5 allocs/op
+BenchmarkDecode-8      	 7519761	       159.0 ns/op	     192 B/op	       5 allocs/op
+BenchmarkApplyPut-8    	 3110254	       376.9 ns/op	     181 B/op	       5 allocs/op
+BenchmarkApplyPut-8    	 3235185	       382.7 ns/op	     181 B/op	       5 allocs/op
+BenchmarkApplyPut-8    	 2825047	       476.4 ns/op	     181 B/op	       5 allocs/op
+BenchmarkApplyRead-8   	10242784	       125.1 ns/op	      32 B/op	       2 allocs/op
+BenchmarkApplyRead-8   	 8630359	       163.4 ns/op	      32 B/op	       2 allocs/op
+BenchmarkApplyRead-8   	 5954266	       207.3 ns/op	      32 B/op	       2 allocs/op
+BenchmarkSnapshot/encode-8         	     391	   3309460 ns/op	 447.78 MB/s	 1720320 B/op	       2 allocs/op
+BenchmarkSnapshot/encode-8         	     525	   2672530 ns/op	 554.50 MB/s	 1720320 B/op	       2 allocs/op
+BenchmarkSnapshot/encode-8         	     424	   2881372 ns/op	 514.31 MB/s	 1720320 B/op	       2 allocs/op
+BenchmarkSnapshot/restore-8        	     340	   3374999 ns/op	 439.09 MB/s	 3518187 B/op	   30418 allocs/op
+BenchmarkSnapshot/restore-8        	     320	   3375013 ns/op	 439.09 MB/s	 3518183 B/op	   30418 allocs/op
+BenchmarkSnapshot/restore-8        	     388	   3702524 ns/op	 400.25 MB/s	 3518188 B/op	   30418 allocs/op
+PASS
+ok  	github.com/bhattt1/RaftBasedDistributedKey/internal/kv	29.366s
+micro exit=0
