@@ -1,0 +1,91 @@
+# Three-node cluster for local development and the demo scripts.
+#
+# INSECURE DEVELOPMENT MODE: no TLS, no client authentication. Every port is
+# published on 127.0.0.1 only. For the secure configuration see
+# docker-compose.secure.yml.
+#
+#   docker compose up -d --build
+#   bin/kvctl put greeting hello          (after `make build`)
+#   docker compose down                   (keeps the data volumes)
+#
+# Clients on the host reach node nX at http://127.0.0.1:800X; metrics are at
+# http://127.0.0.1:900X/metrics.
+name: raftkv
+
+x-node: &node
+  image: raftkv:local
+  pull_policy: never
+  restart: "no"
+  # The container needs to write only to its data volume.
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+  networks: [cluster]
+  stop_grace_period: 15s
+  healthcheck:
+    test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8000/healthz"]
+    interval: 2s
+    timeout: 2s
+    retries: 15
+  environment: &env
+    RAFTKV_INSECURE_DEV: "true"
+    RAFTKV_CLUSTER_ID: compose-dev
+    RAFTKV_DATA_DIR: /var/lib/raftkv
+    RAFTKV_RAFT_LISTEN: ":7000"
+    RAFTKV_HTTP_LISTEN: ":8000"
+    # Inside the container this must listen on all interfaces to be reachable
+    # through the published port, which is bound to the host's loopback.
+    RAFTKV_ADMIN_LISTEN: ":9000"
+    # Peers dial each other by service name on the Compose network. The URL
+    # after "@" is what a node hands to clients as the leader hint, so it is
+    # the address clients on the host use, not the container name.
+    RAFTKV_PEERS: "n1=n1:7000@http://127.0.0.1:8001,n2=n2:7000@http://127.0.0.1:8002,n3=n3:7000@http://127.0.0.1:8003"
+    # Small values so the snapshot demo does not need millions of writes.
+    # The server's own defaults are 10000 and 1000.
+    RAFTKV_SNAPSHOT_THRESHOLD: "${RAFTKV_SNAPSHOT_THRESHOLD:-1000}"
+    RAFTKV_SNAPSHOT_TRAILING: "${RAFTKV_SNAPSHOT_TRAILING:-100}"
+    RAFTKV_LOG_LEVEL: "${RAFTKV_LOG_LEVEL:-info}"
+    RAFTKV_UNSAFE_NO_FSYNC: "${RAFTKV_UNSAFE_NO_FSYNC:-false}"
+    RAFTKV_ENABLE_PPROF: "${RAFTKV_ENABLE_PPROF:-false}"
+
+services:
+  # Every node runs the same image. Only n1 declares how to build it: three
+  # services building one tag at the same time race with each other. Compose
+  # builds before it starts anything, so n2 and n3 find the image in place.
+  n1:
+    <<: *node
+    build:
+      context: .
+      target: runtime
+    hostname: n1
+    environment:
+      <<: *env
+      RAFTKV_NODE_ID: n1
+    ports: ["127.0.0.1:8001:8000", "127.0.0.1:9001:9000"]
+    volumes: ["n1-data:/var/lib/raftkv"]
+  n2:
+    <<: *node
+    hostname: n2
+    environment:
+      <<: *env
+      RAFTKV_NODE_ID: n2
+    ports: ["127.0.0.1:8002:8000", "127.0.0.1:9002:9000"]
+    volumes: ["n2-data:/var/lib/raftkv"]
+  n3:
+    <<: *node
+    hostname: n3
+    environment:
+      <<: *env
+      RAFTKV_NODE_ID: n3
+    ports: ["127.0.0.1:8003:8000", "127.0.0.1:9003:9000"]
+    volumes: ["n3-data:/var/lib/raftkv"]
+
+networks:
+  cluster:
+
+# One volume per node. `docker compose down` leaves them in place;
+# scripts/cluster.sh reset is the only thing that deletes them.
+volumes:
+  n1-data:
+  n2-data:
+  n3-data:

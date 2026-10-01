@@ -1,0 +1,26 @@
+# Test-only override that lets the fault-injection scripts cut nodes off from
+# each other. Use it together with the base file:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.chaos.yml up -d --build
+#
+# It changes two things, both needed for iptables inside the container:
+#   - the image is built from the "chaos" target, which has iptables installed
+#   - the container may hold NET_ADMIN and NET_RAW
+#
+# The kvserver process itself still runs as the unprivileged user and, because
+# of no-new-privileges, cannot use those capabilities. The scripts apply
+# packet-filter rules with `docker compose exec -u 0`.
+#
+# Do not use this file for anything but testing.
+x-chaos: &chaos
+  image: raftkv:chaos
+  cap_add: [NET_ADMIN, NET_RAW]
+
+services:
+  n1:
+    <<: *chaos
+    build:
+      context: .
+      target: chaos
+  n2: *chaos
+  n3: *chaos
