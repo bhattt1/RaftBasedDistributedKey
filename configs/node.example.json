@@ -1,0 +1,34 @@
+{
+  "node_id": "n1",
+  "cluster_id": "example",
+  "data_dir": "/var/lib/raftkv",
+
+  "raft_listen": ":7000",
+  "http_listen": ":8000",
+  "admin_listen": "127.0.0.1:9000",
+
+  "peers": [
+    {"id": "n1", "raft_addr": "n1.example.internal:7000", "http_addr": "http://n1.example.internal:8000"},
+    {"id": "n2", "raft_addr": "n2.example.internal:7000", "http_addr": "http://n2.example.internal:8000"},
+    {"id": "n3", "raft_addr": "n3.example.internal:7000", "http_addr": "http://n3.example.internal:8000"}
+  ],
+
+  "tick_interval": "100ms",
+  "election_ticks": 10,
+  "heartbeat_ticks": 2,
+
+  "request_timeout": "5s",
+  "max_request_timeout": "30s",
+  "shutdown_timeout": "10s",
+
+  "max_pending_proposals": 1024,
+  "snapshot_threshold": 10000,
+  "snapshot_trailing": 1000,
+  "wal_segment_bytes": 16777216,
+
+  "log_level": "info",
+  "log_format": "json",
+  "enable_pprof": false,
+
+  "insecure_dev": true
+}
