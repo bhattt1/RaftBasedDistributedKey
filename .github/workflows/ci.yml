@@ -1,0 +1,118 @@
+# Continuous integration. Each job maps to Makefile targets, so anything that
+# fails here can be reproduced locally with the same command.
+#
+# Third-party actions are pinned to a commit, with the release they belong to
+# in a comment. The Go version comes from go.mod; code-generation and lint
+# tools come from scripts/install-tools.sh, which pins their versions.
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: lint, generated code, build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+      - name: Install pinned tools
+        run: make tools
+      - name: Formatting, vet, staticcheck
+        run: make lint
+      - name: Generated code is up to date
+        run: make generate-check
+      - name: go.mod and go.sum are tidy
+        run: |
+          go mod tidy
+          git diff --exit-code -- go.mod go.sum
+      - name: Build
+        run: make build
+      - name: Cross-compile for Windows
+        run: make build-windows
+
+  test:
+    name: unit tests (race), simulations, history checking
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+      - name: Unit tests under the race detector
+        run: make test-race
+      - name: Raft simulation, 300 seeds
+        run: make sim
+      - name: Storage crash injection, 60 seeds
+        run: make crash
+      - name: Linearizability checks
+        run: make linearizability
+
+  integration:
+    name: real processes
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+      - name: Integration tests
+        # The runner's work directory is on a real disk, unlike /tmp on some
+        # systems, so fsync is exercised for real.
+        run: |
+          mkdir -p "$RUNNER_TEMP/raftkv"
+          TMPDIR="$RUNNER_TEMP/raftkv" make integration
+
+  docker:
+    name: image, compose cluster, fault demos
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+      - name: Crash, partition, link failure, quorum loss, snapshot and five-node demos
+        run: make chaos
+      - name: Secure cluster starts and enforces authentication
+        run: |
+          scripts/gen-dev-certs.sh
+          scripts/cluster.sh secure-up
+          args=(--endpoints https://127.0.0.1:8201,https://127.0.0.1:8202,https://127.0.0.1:8203 --ca-cert certs/ca.pem)
+          bin/kvctl "${args[@]}" --token-file certs/client.token --timeout 30s put ci/key value
+          test "$(bin/kvctl "${args[@]}" --token-file certs/client.token get ci/key)" = "value"
+          if bin/kvctl "${args[@]}" --timeout 5s get ci/key; then echo "request without a token succeeded" >&2; exit 1; fi
+      - name: Node logs
+        if: failure()
+        run: |
+          docker compose -f docker-compose.yml -f docker-compose.chaos.yml logs --tail=200 || true
+          docker compose -f docker-compose.5node.yml logs --tail=100 || true
+
+  vulnerabilities:
+    name: dependency vulnerabilities
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+      - name: Install govulncheck
+        run: go install golang.org/x/vuln/cmd/govulncheck@v1.8.0
+      # Prints every finding. Fails on anything not listed, with a reason, in
+      # .vuln-exceptions, and on listed exceptions that no longer apply.
+      - name: govulncheck
+        run: scripts/vulncheck.sh

@@ -1,0 +1,22 @@
+# Known vulnerabilities that scripts/vulncheck.sh tolerates.
+#
+# The scan fails on every finding that is not listed here, and it also fails
+# when an entry here is no longer reported (so stale exceptions get removed).
+# Each entry needs a reason and a condition for removing it.
+#
+# Format: <ID> <date reviewed> <reason>
+
+# gRPC server panic on a request with a missing :authority/Host header.
+# Affects the peer listener (the only gRPC server in this project).
+#   - Latest stable grpc-go is v1.84.0, which is affected. The fix exists only
+#     on an unreleased development branch (v1.85.0-dev pseudo-version), and
+#     this project pins released versions only.
+#   - Impact here is availability, not safety: a panic stops one node, which
+#     is a crash failure the cluster is built to tolerate, and the node
+#     recovers its state on restart.
+#   - In secure mode the peer listener requires a client certificate signed by
+#     the cluster CA before any HTTP/2 request is read, so only a holder of a
+#     peer certificate can send the request. In --insecure-dev mode anyone who
+#     can reach the peer port can; that mode is documented as local-only.
+# Remove when: grpc-go v1.85.0 is released; upgrade and delete this entry.
+GO-2026-6443 2026-10-02 no released grpc-go contains the fix; availability-only; peer port requires mTLS in secure mode

@@ -1,0 +1,52 @@
+# Longer randomised campaigns that are too slow for every push: wide seed
+# sweeps of the simulations and a few minutes of fuzzing per target. Runs
+# nightly and on demand.
+name: nightly
+
+on:
+  schedule:
+    - cron: "17 2 * * *"
+  workflow_dispatch:
+    inputs:
+      fuzztime:
+        description: "Fuzzing time per target"
+        default: "3m"
+
+permissions:
+  contents: read
+
+jobs:
+  sweeps:
+    name: wide simulation sweeps
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+      - name: Raft simulation, 5000 seeds
+        run: make sim RAFT_SIM_SEEDS=5000
+      - name: Storage crash injection, 1000 seeds
+        run: make crash STORAGE_CRASH_SEEDS=1000
+      - name: Linearizability simulation, 5000 seeds
+        run: make linearizability LIN_SIM_SEEDS=5000
+
+  fuzz:
+    name: fuzzing
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+      - name: Fuzz every target
+        run: make fuzz FUZZTIME=${{ inputs.fuzztime || '3m' }}
+      - name: Keep inputs that caused failures
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: fuzz-failures
+          path: internal/**/testdata/fuzz/
+          if-no-files-found: ignore
