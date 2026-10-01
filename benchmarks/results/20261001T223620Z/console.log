@@ -1,0 +1,136 @@
+results: benchmarks/results/20261001T223620Z
+data dir: /home/userlinuxuser/.cache/raftkv-bench (ext2/ext3 on /dev/sdd), commit f25bbd4
+
+### n1-write
+run 1:     2965 ops/s  p50   5.01 ms  p95   8.13 ms  p99  11.69 ms  max  102.40 ms  completed 44468/44468  unknown 0  longest gap 61 ms  leader n1->n1
+run 2:     3246 ops/s  p50   4.51 ms  p95   7.03 ms  p99   8.75 ms  max  120.64 ms  completed 48686/48686  unknown 0  longest gap 86 ms  leader n1->n1
+run 3:     3107 ops/s  p50   4.71 ms  p95   8.18 ms  p99  12.43 ms  max   81.19 ms  completed 46603/46603  unknown 0  longest gap 45 ms  leader n1->n1
+summary over 3 run(s): throughput mean 3106 ops/s (min 2965, max 3246, stddev 115); p50 mean 4.74 ms; p99 mean 10.96 ms
+report written to benchmarks/results/20261001T223620Z/n1-write.json
+
+### n1-read
+run 1:     2786 ops/s  p50   4.37 ms  p95  13.26 ms  p99  19.53 ms  max   48.43 ms  completed 41790/41790  unknown 0  longest gap 36 ms  leader n1->n1
+run 2:     3349 ops/s  p50   4.48 ms  p95   6.54 ms  p99   7.84 ms  max  101.76 ms  completed 50238/50238  unknown 0  longest gap 76 ms  leader n1->n1
+run 3:     3427 ops/s  p50   4.11 ms  p95   7.17 ms  p99  13.53 ms  max   80.78 ms  completed 51408/51408  unknown 0  longest gap 59 ms  leader n1->n1
+summary over 3 run(s): throughput mean 3187 ops/s (min 2786, max 3427, stddev 286); p50 mean 4.32 ms; p99 mean 13.63 ms
+report written to benchmarks/results/20261001T223620Z/n1-read.json
+
+### n1-mixed
+run 1:     2467 ops/s  p50   5.00 ms  p95  12.80 ms  p99  21.80 ms  max  121.27 ms  completed 36998/36998  unknown 0  longest gap 83 ms  leader n1->n1
+run 2:     3652 ops/s  p50   4.11 ms  p95   6.23 ms  p99   8.39 ms  max   31.30 ms  completed 54774/54774  unknown 0  longest gap 26 ms  leader n1->n1
+run 3:     3669 ops/s  p50   4.10 ms  p95   6.18 ms  p99   7.72 ms  max   32.81 ms  completed 55028/55028  unknown 0  longest gap 26 ms  leader n1->n1
+summary over 3 run(s): throughput mean 3262 ops/s (min 2467, max 3669, stddev 563); p50 mean 4.41 ms; p99 mean 12.64 ms
+report written to benchmarks/results/20261001T223620Z/n1-mixed.json
+
+### n1-cas-contended
+run 1:     1365 ops/s  p50   9.79 ms  p95  18.85 ms  p99  27.18 ms  max   50.89 ms  completed 20482/20482  unknown 0  longest gap 27 ms  leader n1->n1
+run 2:     1731 ops/s  p50   8.12 ms  p95  16.15 ms  p99  23.52 ms  max   47.25 ms  completed 25968/25968  unknown 0  longest gap 36 ms  leader n1->n1
+run 3:     1803 ops/s  p50   8.38 ms  p95  11.98 ms  p99  18.13 ms  max   59.33 ms  completed 27050/27050  unknown 0  longest gap 28 ms  leader n1->n1
+summary over 3 run(s): throughput mean 1633 ops/s (min 1365, max 1803, stddev 192); p50 mean 8.76 ms; p99 mean 22.94 ms
+report written to benchmarks/results/20261001T223620Z/n1-cas-contended.json
+
+### n3-write
+run 1:     1265 ops/s  p50  11.42 ms  p95  19.86 ms  p99  32.43 ms  max  157.86 ms  completed 18971/18971  unknown 0  longest gap 128 ms  leader n1->n1
+run 2:     1132 ops/s  p50  12.85 ms  p95  22.29 ms  p99  34.56 ms  max  155.82 ms  completed 16983/16983  unknown 0  longest gap 121 ms  leader n1->n1
+run 3:     1376 ops/s  p50  10.60 ms  p95  17.97 ms  p99  26.13 ms  max  107.26 ms  completed 20646/20646  unknown 0  longest gap 80 ms  leader n1->n1
+summary over 3 run(s): throughput mean 1258 ops/s (min 1132, max 1376, stddev 100); p50 mean 11.62 ms; p99 mean 31.04 ms
+report written to benchmarks/results/20261001T223620Z/n3-write.json
+
+### n3-read
+run 1:     1069 ops/s  p50  14.82 ms  p95  25.15 ms  p99  37.59 ms  max   90.42 ms  completed 16042/16042  unknown 0  longest gap 61 ms  leader n1->n1
+run 2:     1568 ops/s  p50   8.85 ms  p95  14.80 ms  p99  29.30 ms  max  604.05 ms  completed 23523/23523  unknown 0  longest gap 595 ms  leader n1->n1
+run 3:     1582 ops/s  p50   9.33 ms  p95  15.37 ms  p99  21.31 ms  max   91.64 ms  completed 23724/23724  unknown 0  longest gap 75 ms  leader n1->n1
+summary over 3 run(s): throughput mean 1406 ops/s (min 1069, max 1582, stddev 238); p50 mean 11.00 ms; p99 mean 29.40 ms
+report written to benchmarks/results/20261001T223620Z/n3-read.json
+
+### n3-mixed
+run 1:     1363 ops/s  p50   9.34 ms  p95  20.72 ms  p99  29.44 ms  max   85.53 ms  completed 20444/20444  unknown 0  longest gap 79 ms  leader n1->n1
+run 2:     1634 ops/s  p50   9.03 ms  p95  14.37 ms  p99  19.82 ms  max   83.99 ms  completed 24512/24512  unknown 0  longest gap 70 ms  leader n1->n1
+run 3:     1608 ops/s  p50   8.80 ms  p95  15.70 ms  p99  26.56 ms  max  161.03 ms  completed 24119/24119  unknown 0  longest gap 124 ms  leader n1->n1
+summary over 3 run(s): throughput mean 1535 ops/s (min 1363, max 1634, stddev 122); p50 mean 9.06 ms; p99 mean 25.27 ms
+report written to benchmarks/results/20261001T223620Z/n3-mixed.json
+
+### n3-cas-contended
+run 1:      511 ops/s  p50  29.28 ms  p95  48.56 ms  p99  66.60 ms  max  121.98 ms  completed 7658/7658  unknown 0  longest gap 52 ms  leader n1->n1
+run 2:      780 ops/s  p50  18.72 ms  p95  32.66 ms  p99  48.44 ms  max   95.92 ms  completed 11697/11697  unknown 0  longest gap 63 ms  leader n1->n1
+run 3:      773 ops/s  p50  18.87 ms  p95  30.82 ms  p99  46.36 ms  max  199.44 ms  completed 11593/11593  unknown 0  longest gap 137 ms  leader n1->n1
+summary over 3 run(s): throughput mean 688 ops/s (min 511, max 780, stddev 125); p50 mean 22.29 ms; p99 mean 53.80 ms
+report written to benchmarks/results/20261001T223620Z/n3-cas-contended.json
+
+### n5-write
+run 1:      955 ops/s  p50  13.69 ms  p95  31.85 ms  p99  72.90 ms  max  217.37 ms  completed 14329/14329  unknown 0  longest gap 149 ms  leader n3->n3
+run 2:      939 ops/s  p50  16.20 ms  p95  28.71 ms  p99  50.34 ms  max  142.34 ms  completed 14089/14089  unknown 0  longest gap 96 ms  leader n3->n3
+run 3:     1219 ops/s  p50  12.09 ms  p95  19.70 ms  p99  27.54 ms  max  101.95 ms  completed 18282/18282  unknown 0  longest gap 86 ms  leader n3->n3
+summary over 3 run(s): throughput mean 1038 ops/s (min 939, max 1219, stddev 128); p50 mean 13.99 ms; p99 mean 50.26 ms
+report written to benchmarks/results/20261001T223620Z/n5-write.json
+
+### n5-read
+run 1:     1241 ops/s  p50  11.66 ms  p95  19.69 ms  p99  33.70 ms  max  141.98 ms  completed 18619/18619  unknown 0  longest gap 80 ms  leader n3->n3
+run 2:      879 ops/s  p50  17.72 ms  p95  28.93 ms  p99  44.00 ms  max  159.81 ms  completed 13190/13190  unknown 0  longest gap 126 ms  leader n3->n3
+run 3:     1193 ops/s  p50  11.15 ms  p95  25.48 ms  p99  43.51 ms  max  148.78 ms  completed 17891/17891  unknown 0  longest gap 133 ms  leader n3->n3
+summary over 3 run(s): throughput mean 1104 ops/s (min 879, max 1241, stddev 160); p50 mean 13.51 ms; p99 mean 40.41 ms
+report written to benchmarks/results/20261001T223620Z/n5-read.json
+
+### n5-mixed
+run 1:     1386 ops/s  p50  10.71 ms  p95  17.44 ms  p99  22.32 ms  max   82.38 ms  completed 20790/20790  unknown 0  longest gap 68 ms  leader n3->n3
+run 2:     1080 ops/s  p50  13.26 ms  p95  25.31 ms  p99  34.02 ms  max   94.22 ms  completed 16203/16203  unknown 0  longest gap 74 ms  leader n3->n3
+run 3:      940 ops/s  p50  15.73 ms  p95  29.36 ms  p99  43.29 ms  max  109.91 ms  completed 14093/14093  unknown 0  longest gap 67 ms  leader n3->n3
+summary over 3 run(s): throughput mean 1135 ops/s (min 940, max 1386, stddev 186); p50 mean 13.23 ms; p99 mean 33.21 ms
+report written to benchmarks/results/20261001T223620Z/n5-mixed.json
+
+### n5-cas-contended
+run 1:      555 ops/s  p50  27.14 ms  p95  41.69 ms  p99  72.65 ms  max  129.44 ms  completed 8328/8328  unknown 0  longest gap 54 ms  leader n3->n3
+run 2:      485 ops/s  p50  28.47 ms  p95  52.06 ms  p99 113.07 ms  max  704.80 ms  completed 7280/7280  unknown 0  longest gap 655 ms  leader n3->n3
+run 3:      378 ops/s  p50  29.99 ms  p95  95.51 ms  p99 164.15 ms  max  229.42 ms  completed 5663/5663  unknown 0  longest gap 110 ms  leader n3->n3
+summary over 3 run(s): throughput mean 473 ops/s (min 378, max 555, stddev 73); p50 mean 28.53 ms; p99 mean 116.62 ms
+report written to benchmarks/results/20261001T223620Z/n5-cas-contended.json
+
+### n3-write-clients1
+run 1:      169 ops/s  p50   5.70 ms  p95   8.13 ms  p99   9.66 ms  max   31.08 ms  completed 2535/2535  unknown 0  longest gap 31 ms  leader n3->n3
+run 2:      170 ops/s  p50   5.61 ms  p95   7.89 ms  p99   9.61 ms  max   55.97 ms  completed 2545/2545  unknown 0  longest gap 56 ms  leader n3->n3
+run 3:      175 ops/s  p50   5.47 ms  p95   7.89 ms  p99   9.13 ms  max   32.04 ms  completed 2623/2623  unknown 0  longest gap 32 ms  leader n3->n3
+summary over 3 run(s): throughput mean 171 ops/s (min 169, max 175, stddev 3); p50 mean 5.59 ms; p99 mean 9.47 ms
+report written to benchmarks/results/20261001T223620Z/n3-write-clients1.json
+
+### n3-write-clients4
+run 1:      314 ops/s  p50  12.85 ms  p95  21.21 ms  p99  27.37 ms  max   43.51 ms  completed 4717/4717  unknown 0  longest gap 36 ms  leader n3->n3
+run 2:      427 ops/s  p50   8.83 ms  p95  13.73 ms  p99  18.01 ms  max   69.90 ms  completed 6407/6407  unknown 0  longest gap 43 ms  leader n3->n3
+run 3:      398 ops/s  p50   9.03 ms  p95  15.77 ms  p99  25.31 ms  max  181.68 ms  completed 5975/5975  unknown 0  longest gap 170 ms  leader n3->n3
+summary over 3 run(s): throughput mean 380 ops/s (min 314, max 427, stddev 48); p50 mean 10.24 ms; p99 mean 23.56 ms
+report written to benchmarks/results/20261001T223620Z/n3-write-clients4.json
+
+### n3-write-clients16
+run 1:     1218 ops/s  p50  12.22 ms  p95  20.39 ms  p99  27.70 ms  max   87.94 ms  completed 18269/18269  unknown 0  longest gap 32 ms  leader n3->n3
+run 2:      813 ops/s  p50  18.82 ms  p95  33.52 ms  p99  55.43 ms  max  128.60 ms  completed 12188/12188  unknown 0  longest gap 97 ms  leader n3->n3
+run 3:     1361 ops/s  p50  10.63 ms  p95  18.04 ms  p99  34.91 ms  max  108.29 ms  completed 20414/20414  unknown 0  longest gap 76 ms  leader n3->n3
+summary over 3 run(s): throughput mean 1130 ops/s (min 813, max 1361, stddev 232); p50 mean 13.89 ms; p99 mean 39.35 ms
+report written to benchmarks/results/20261001T223620Z/n3-write-clients16.json
+
+### n3-write-clients64
+run 1:     3893 ops/s  p50  13.97 ms  p95  29.95 ms  p99  60.57 ms  max  170.15 ms  completed 58390/58390  unknown 0  longest gap 128 ms  leader n3->n3
+run 2:     4271 ops/s  p50  13.46 ms  p95  23.98 ms  p99  39.93 ms  max  229.55 ms  completed 64064/64064  unknown 0  longest gap 166 ms  leader n3->n3
+run 3:     3223 ops/s  p50  19.51 ms  p95  30.54 ms  p99  40.23 ms  max   57.97 ms  completed 48340/48340  unknown 0  longest gap 50 ms  leader n3->n3
+summary over 3 run(s): throughput mean 3795 ops/s (min 3223, max 4271, stddev 433); p50 mean 15.65 ms; p99 mean 46.91 ms
+report written to benchmarks/results/20261001T223620Z/n3-write-clients64.json
+
+### n3-write-value4k
+run 1:     1175 ops/s  p50  13.25 ms  p95  18.94 ms  p99  24.92 ms  max   44.16 ms  completed 17629/17629  unknown 0  longest gap 30 ms  leader n3->n3
+run 2:     1047 ops/s  p50  13.18 ms  p95  27.36 ms  p99  45.18 ms  max  142.28 ms  completed 15704/15704  unknown 0  longest gap 123 ms  leader n3->n3
+run 3:     1019 ops/s  p50  12.97 ms  p95  29.84 ms  p99  40.02 ms  max  232.87 ms  completed 15281/15281  unknown 0  longest gap 129 ms  leader n3->n3
+summary over 3 run(s): throughput mean 1080 ops/s (min 1019, max 1175, stddev 68); p50 mean 13.13 ms; p99 mean 36.71 ms
+report written to benchmarks/results/20261001T223620Z/n3-write-value4k.json
+
+### n3-write-UNSAFE-nofsync
+run 1:    10471 ops/s  p50   1.36 ms  p95   2.67 ms  p99   4.12 ms  max   29.67 ms  completed 157069/157069  unknown 0  longest gap 15 ms  leader n3->n3
+run 2:    10308 ops/s  p50   1.40 ms  p95   2.71 ms  p99   4.10 ms  max   32.36 ms  completed 154622/154622  unknown 0  longest gap 11 ms  leader n3->n3
+run 3:     9114 ops/s  p50   1.46 ms  p95   3.29 ms  p99   6.43 ms  max   68.54 ms  completed 136705/136705  unknown 0  longest gap 38 ms  leader n3->n3
+summary over 3 run(s): throughput mean 9964 ops/s (min 9114, max 10471, stddev 605); p50 mean 1.41 ms; p99 mean 4.88 ms
+report written to benchmarks/results/20261001T223620Z/n3-write-UNSAFE-nofsync.json
+
+### n3-failover (killing leader n3 8s into a 20s run)
+run 1:     1288 ops/s  p50  10.25 ms  p95  19.63 ms  p99  30.20 ms  max 3455.56 ms  completed 25767/25767  unknown 0  longest gap 1318 ms  leader n3->n1
+summary over 1 run(s): throughput mean 1288 ops/s (min 1288, max 1288, stddev 0); p50 mean 10.25 ms; p99 mean 30.20 ms
+report written to benchmarks/results/20261001T223620Z/n3-failover.json
+
+done. Reports are in benchmarks/results/20261001T223620Z
+bench exit=0

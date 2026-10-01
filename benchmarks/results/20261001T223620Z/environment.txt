@@ -1,0 +1,8 @@
+started: 20261001T223620Z
+commit: f25bbd4
+go: go version go1.27.1 linux/amd64
+kernel: Linux 6.18.33.2-microsoft-standard-WSL2 x86_64
+cpu: 11th Gen Intel(R) Core(TM) i5-1135G7 @ 2.40GHz (8 logical CPUs)
+memory: 7.6 GiB
+data dir: /home/userlinuxuser/.cache/raftkv-bench (ext2/ext3 on /dev/sdd)
+runs per configuration: 3 x 15s after 3s warm-up
