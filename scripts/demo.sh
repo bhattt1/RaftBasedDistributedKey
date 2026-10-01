@@ -4,10 +4,12 @@
 #   scripts/demo.sh
 #
 # It builds and starts a three-node cluster in Docker, shows ordinary
-# operations, then runs each failure demo in turn. Every demo checks its own
-# claims and stops with a non-zero exit code if one does not hold.
+# operations, then runs each failure demo in turn, the last one on a five-node
+# cluster. Every demo checks its own claims and stops with a non-zero exit
+# code if one does not hold.
 #
-# Takes a few minutes. The cluster is left running afterwards;
+# Takes a minute or two once the image is built. The three-node cluster is
+# left running afterwards;
 # `scripts/cluster.sh down` stops it (keeping data) and
 # `scripts/cluster.sh reset` deletes its data.
 source "$(dirname "$0")/lib.sh"
@@ -40,6 +42,10 @@ scripts/demo-partition.sh
 scripts/demo-link-failure.sh
 scripts/demo-quorum-loss.sh
 scripts/demo-snapshot.sh
+# The five-node demo runs its own cluster on other ports. Stop it afterwards
+# (its data is kept) so only the three-node cluster is left running.
+scripts/demo-five-node.sh | grep -v "still running"
+docker compose -f docker-compose.5node.yml stop >/dev/null 2>&1 </dev/null
 
 step "Final state"
 kvctl status | sed 's/^/    /'
