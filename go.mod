@@ -1,6 +1,8 @@
 module github.com/bhattt1/RaftBasedDistributedKey
 
-go 1.27.2
+go 1.27.1
+
+toolchain go1.27.2
 
 require (
 	github.com/anishathalye/porcupine v1.3.1

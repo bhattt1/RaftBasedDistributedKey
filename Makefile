@@ -14,6 +14,14 @@ VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
 LDFLAGS := -X main.version=$(VERSION)
 PKGS    := ./...
 
+# staticcheck cannot yet read the export-data format go1.27.2 emits (version 5;
+# it supports up to version 4). Until a staticcheck release catches up, run it
+# with the 1.27.1 toolchain, which the `go` directive in go.mod still permits.
+# Everything else (build, tests, vuln scan) uses the toolchain directive,
+# go1.27.2, which carries the standard-library security fixes. Remove this and
+# the GOTOOLCHAIN prefixes below once staticcheck supports go1.27.2.
+STATICCHECK_TOOLCHAIN ?= go1.27.1
+
 # Seeds for the randomised suites. Raise them for a deeper local run, e.g.
 #   make sim RAFT_SIM_SEEDS=2000
 RAFT_SIM_SEEDS      ?= 300
@@ -65,8 +73,8 @@ vet: ## Run go vet, including the integration tests
 
 .PHONY: staticcheck
 staticcheck: ## Run staticcheck
-	staticcheck $(PKGS)
-	staticcheck -tags integration ./tests/integration/
+	GOTOOLCHAIN=$(STATICCHECK_TOOLCHAIN) staticcheck $(PKGS)
+	GOTOOLCHAIN=$(STATICCHECK_TOOLCHAIN) staticcheck -tags integration ./tests/integration/
 
 .PHONY: vuln
 vuln: ## Check dependencies for known vulnerabilities (exceptions: .vuln-exceptions)
